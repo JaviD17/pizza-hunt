@@ -1,4 +1,4 @@
-const { Pizza, Comment } = require("../models");
+const { Comment, Pizza } = require('../models');
 
 const commentController = {
   // add comment to pizza
@@ -6,31 +6,28 @@ const commentController = {
     console.log(body);
     Comment.create(body)
       .then(({ _id }) => {
-        // console.log(_id);
         return Pizza.findOneAndUpdate(
           { _id: params.pizzaId },
           { $push: { comments: _id } },
           { new: true }
         );
       })
-      .then((dbPizzaData) => {
+      .then(dbPizzaData => {
         if (!dbPizzaData) {
-          return res
-            .status(404)
-            .json({ message: "No pizza found with this id" });
+          res.status(404).json({ message: 'No pizza found with this id!' });
+          return;
         }
         res.json(dbPizzaData);
       })
-      .catch((err) => res.json(err));
+      .catch(err => res.json(err));
   },
+
   // remove comment
   removeComment({ params }, res) {
     Comment.findOneAndDelete({ _id: params.commentId })
-      .then((deletedComment) => {
+      .then(deletedComment => {
         if (!deletedComment) {
-          return res
-            .status(404)
-            .json({ message: "No comment found with this id!" });
+          return res.status(404).json({ message: 'No comment with this id!' });
         }
         return Pizza.findOneAndUpdate(
           { _id: params.pizzaId },
@@ -38,16 +35,15 @@ const commentController = {
           { new: true }
         );
       })
-      .then((dbPizzaData) => {
+      .then(dbPizzaData => {
         if (!dbPizzaData) {
-          return res
-            .status(404)
-            .json({ message: "No pizza found with this id!" });
+          res.status(404).json({ message: 'No pizza found with this id!' });
+          return;
         }
         res.json(dbPizzaData);
       })
-      .catch((err) => res.json(err));
-  },
+      .catch(err => res.json(err));
+  }
 };
 
 module.exports = commentController;
